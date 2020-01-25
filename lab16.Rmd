@@ -18,6 +18,7 @@ The purpose of this in-class lab is to use R to practice with panel data estimat
 
 ## For starters
 Open up a new R script (named `ICL16_XYZ.R`, where `XYZ` are your initials) and add the usual "preamble" to the top:
+
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 # Add names of group members HERE
 library(tidyverse)
@@ -31,6 +32,7 @@ library(plm)   # You may need to install this package
 
 ### Load the data
 Our data set will be a panel of wages for 545 men. Load the data from the `wooldridge` package, format `year` to be a factor, and rename the variable `nr` to something more descriptive (`id`):
+
 ```{r}
 df <- as_tibble(wagepan)
 df %<>% mutate(year=as.factor(year))
@@ -39,11 +41,13 @@ df %<>% rename(id = nr)
 
 ### Summary statistics for panel data
 It is important to know what your panel looks like. How many units? How many time periods? The easiest way to do this is the `pdim()` function in the `plm` package.
+
 ```{r}
 pdim(df)
 ```
 
 It is also helpful to "convert" the data to a cross-section of within-unit averages. Let's do this for some of the key variables of our analysis.
+
 ```{r}
 df.within <- df %>% select(id,year,educ,married,union,rur) %>% 
              group_by(id) %>% 
@@ -76,6 +80,7 @@ Now estimate the following model using various options of the `plm()` function:
 
 ### Pooled OLS
 The pooled OLS model can be run from the `plm()` function as follows.
+
 ```{r}
 est.pols <- plm(lwage ~ educ + black + hisp + exper + I(exper^2) + married + union + rur + year,
                 data = df, index = c("id","year"), model = "pooling")
@@ -84,6 +89,7 @@ est.pols <- plm(lwage ~ educ + black + hisp + exper + I(exper^2) + married + uni
 4. Interpret the coefficient on $\beta_7$ in the pooled OLS model
 
 ### Random effects
+
 ```{r}
 est.re <- plm(lwage ~ educ + black + hisp + exper + I(exper^2) + married + union + rur + year, 
               data = df, index = c("id","year"), model = "random")
@@ -94,6 +100,7 @@ est.re <- plm(lwage ~ educ + black + hisp + exper + I(exper^2) + married + union
 6. What is the estimate of $\theta$ in the RE model? (Hint: check `est.re$ercomp$theta`) What does this tell you about what you expect the random effects estimates to be relative to the fixed effects estimates?
 
 ### Fixed effects
+
 ```{r}
 est.fe <- plm(lwage ~ I(exper^2) + married + union + rur + year, 
               data = df, index = c("id","year"), model = "within")
@@ -103,6 +110,7 @@ est.fe <- plm(lwage ~ I(exper^2) + married + union + rur + year,
 
 ## Clustered standard errors
 As discussed in class, the most appropriate standard errors are not those reported by `plm()`. Let's compute standard errors that account for within-person serial correlation, and that are robust to heteroskedasticity:
+
 ```{r}
 clust.po <- coef_test(est.pols, vcov = "CR1", cluster = "individual")
 clust.re <- coef_test(est.re,   vcov = "CR1", cluster = "individual")
@@ -110,6 +118,7 @@ clust.fe <- coef_test(est.fe,   vcov = "CR1", cluster = "individual")
 ```
 
 We can put these all in one `stargazer` table:
+
 ```{r}
 stargazer(est.pols,est.re,est.fe,se=list(clust.po$SE,clust.re$SE,clust.fe$SE),type="text")
 ```

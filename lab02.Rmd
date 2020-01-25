@@ -18,6 +18,7 @@ The purpose of this lab is to practice using R to conduct hypothesis tests and r
 
 ## For starters
 Open up a new R script (named `ICL2_XYZ.R`, where `XYZ` are your initials) and add the following to the top:
+
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 library(tidyverse)
 library(skimr)
@@ -36,10 +37,11 @@ The `audit` data set contains three variables: `w`, `b`, and `y`. The variables 
 
 We want to test the following hypothesis:
 
-\[
-H_0: \mu=0 \\
-H_a: \mu<0
-\]
+
+$H_0: \mu=0$
+$H_a: \mu<0$
+
+
 where $\mu = \theta_{B}-\theta_{W}$, i.e. the difference in respective job offer rates for blacks and whites.
 
 ### The `t.test()` function in R
